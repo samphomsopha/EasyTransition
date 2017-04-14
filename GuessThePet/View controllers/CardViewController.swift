@@ -24,8 +24,8 @@ import UIKit
 
 private let revealSequeId = "revealSegue"
 private let transitioncontroller = TransitionController()
-private let flipPresentAnimationController = transitioncontroller.transitionAnimator(type: .FlipPresent)
-private let flipDismissAnimationController = transitioncontroller.transitionAnimator(type: .FlipDismiss)
+private let flipPresentAnimationController = transitioncontroller.transitionAnimator(type: .SlideLeft)
+private let flipDismissAnimationController = transitioncontroller.transitionAnimator(type: .SlideRight)
 private let swipeInteractionController = SwipeInteractionController()
 
 class CardViewController: UIViewController {
@@ -62,8 +62,8 @@ class CardViewController: UIViewController {
     func handleTap() {
         if let destinationViewController = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RevealViewController") as? RevealViewController {
             destinationViewController.petCard = petCard
-            flipPresentAnimationController.animationSettings(["originFrame": cardView.frame, "duration": 2.0])
-            flipDismissAnimationController.animationSettings(["destinationFrame" : cardView.frame])
+            //flipPresentAnimationController.animationSettings(["originFrame": cardView.frame, "duration": 2.0])
+            //flipDismissAnimationController.animationSettings(["destinationFrame" : cardView.frame])
             destinationViewController.transitioningDelegate = transitioncontroller
             present(destinationViewController, animated: true, completion: nil)
         }

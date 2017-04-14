@@ -9,7 +9,7 @@
 import UIKit
 
 enum WTransitionType {
-    case FlipPresent, FlipDismiss
+    case FlipPresent, FlipDismiss, SlideRight, SlideLeft, SlideTop, SlideBottom
 }
 
 protocol WAnimatedTransitioning: UIViewControllerAnimatedTransitioning {
@@ -29,6 +29,22 @@ class TransitionController: NSObject {
             return FlipDismissAnimationController()
         case .FlipPresent:
             return FlipPresentAnimationController()
+        case .SlideRight:
+            let controller = SlideAnimationController()
+            controller.animationSettings(["direction": SlideAnimationDirection.right])
+            return controller
+        case .SlideLeft:
+            let controller = SlideAnimationController()
+            controller.animationSettings(["direction": SlideAnimationDirection.left])
+            return controller
+        case .SlideTop:
+            let controller = SlideAnimationController()
+            controller.animationSettings(["direction": SlideAnimationDirection.top])
+            return controller
+        case .SlideBottom:
+            let controller = SlideAnimationController()
+            controller.animationSettings(["direction": SlideAnimationDirection.bottom])
+            return controller
         }
     }
 }
@@ -42,7 +58,7 @@ extension TransitionController: UIViewControllerTransitioningDelegate {
         return dismissingAnimator
     }
     
-    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-                return dismissingInteractiveController?.interactionInProgress ? dismissingInteractiveController? : nil
-            }
+//    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+//                return dismissingInteractiveController?.interactionInProgress ? dismissingInteractiveController? : nil
+//            }
 }
