@@ -8,14 +8,25 @@
 
 import UIKit
 
-class FlipDismissAnimationController: NSObject {
+class FlipDismissAnimationController: NSObject, WAnimatedTransitioning {
     var destinationFrame = CGRect.zero
+    var transitionDuration = 1.0
     
-    func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> TimeInterval {
-        return 0.6
+    func animationSettings(_ settings: [String : Any]) {
+        if let destinationFrame = settings["destinationFrame"] as? CGRect {
+            self.destinationFrame = destinationFrame
+        }
+        
+        if let transitionDuration = (settings["duration"] as AnyObject).doubleValue {
+            self.transitionDuration = transitionDuration
+        }
     }
     
-    func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
+    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return transitionDuration
+    }
+    
+    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from),
             let toVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.to) else {
                 return
@@ -23,7 +34,6 @@ class FlipDismissAnimationController: NSObject {
         
         let containerView = transitionContext.containerView
         
-        let initialFrame = transitionContext.initialFrame(for: fromVC)
         let finalFrame = destinationFrame
         
         let snapshot = fromVC.view.snapshotView(afterScreenUpdates: false)
@@ -38,7 +48,7 @@ class FlipDismissAnimationController: NSObject {
 
         toVC.view.layer.transform = AnimationHelper.yRotation(-M_PI_2)
 
-        let duration = transitionDuration(transitionContext: transitionContext)
+        let duration = transitionDuration(using: transitionContext)
         
         UIView.animateKeyframes(
             withDuration: duration,

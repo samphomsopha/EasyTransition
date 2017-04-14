@@ -23,8 +23,10 @@
 import UIKit
 
 private let revealSequeId = "revealSegue"
-private let flipPresentAnimationController = FlipPresentAnimationController()
-private let flipDismissAnimationController = FlipDismissAnimationController()
+private let transitioncontroller = TransitionController()
+private let flipPresentAnimationController = transitioncontroller.transitionAnimator(type: .FlipPresent)
+private let flipDismissAnimationController = transitioncontroller.transitionAnimator(type: .FlipDismiss)
+private let swipeInteractionController = SwipeInteractionController()
 
 class CardViewController: UIViewController {
     
@@ -42,29 +44,46 @@ class CardViewController: UIViewController {
         cardView.layer.masksToBounds = true
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         cardView.addGestureRecognizer(tapRecognizer)
+        
+        transitioncontroller.presentingAnimator = flipPresentAnimationController
+        transitioncontroller.dismissingAnimator = flipDismissAnimationController
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == revealSequeId, let destinationViewController = segue.destination as? RevealViewController {
             destinationViewController.petCard = petCard
-            destinationViewController.transitioningDelegate = self
+            flipPresentAnimationController.animationSettings(["originFrame": cardView.frame, "duration": 2.0])
+            flipDismissAnimationController.animationSettings(["destinationFrame" : cardView.frame])
+            destinationViewController.transitioningDelegate = transitioncontroller
+            //swipeInteractionController.wireToViewController(viewController: destinationViewController)
         }
     }
     
     func handleTap() {
-        performSegue(withIdentifier: revealSequeId, sender: nil)
+        if let destinationViewController = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RevealViewController") as? RevealViewController {
+            destinationViewController.petCard = petCard
+            flipPresentAnimationController.animationSettings(["originFrame": cardView.frame, "duration": 2.0])
+            flipDismissAnimationController.animationSettings(["destinationFrame" : cardView.frame])
+            destinationViewController.transitioningDelegate = transitioncontroller
+            present(destinationViewController, animated: true, completion: nil)
+        }
+        //performSegue(withIdentifier: revealSequeId, sender: nil)
     }
 }
 
-extension CardViewController: UIViewControllerTransitioningDelegate {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        flipPresentAnimationController.originFrame = cardView.frame
-        return flipPresentAnimationController
-    }
-    
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        
-        flipDismissAnimationController.destinationFrame = cardView.frame
-        return flipDismissAnimationController
-    }
-}
+//extension CardViewController: UIViewControllerTransitioningDelegate {
+//    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+//        flipPresentAnimationController.animationSettings(["originFrame": cardView.frame, "duration": 2.0])
+//        return flipPresentAnimationController
+//    }
+//    
+//    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+//        
+//        flipDismissAnimationController.animationSettings(["destinationFrame" : cardView.frame])
+//        return flipDismissAnimationController
+//    }
+//    
+//    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+//        return swipeInteractionController.interactionInProgress ? swipeInteractionController : nil
+//    }
+//}

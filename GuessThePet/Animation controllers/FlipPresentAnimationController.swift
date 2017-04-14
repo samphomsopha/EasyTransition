@@ -8,8 +8,19 @@
 
 import UIKit
 
-class FlipPresentAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
+class FlipPresentAnimationController: NSObject, WAnimatedTransitioning {
     var originFrame = CGRect.zero
+    var transitionDuration = 1.0
+    
+    func animationSettings(_ settings: [String : Any]) {
+        if let originFrame = settings["originFrame"] as? CGRect {
+            self.originFrame = originFrame
+        }
+        
+        if let transitionDuration = (settings["duration"] as AnyObject).doubleValue {
+            self.transitionDuration = transitionDuration
+        }
+    }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromVC = transitionContext.viewController(forKey: UITransitionContextViewControllerKey.from),
@@ -66,7 +77,7 @@ class FlipPresentAnimationController: NSObject, UIViewControllerAnimatedTransiti
     }
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return 2.0
+        return transitionDuration
     }
 
 }
