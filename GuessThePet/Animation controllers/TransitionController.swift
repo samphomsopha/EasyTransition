@@ -8,18 +8,29 @@
 
 import UIKit
 
-enum WTransitionType {
+public enum WTransitionType {
     case FlipPresent, FlipDismiss, SlideRight, SlideLeft, SlideTop, SlideBottom
 }
 
-protocol WAnimatedTransitioning: UIViewControllerAnimatedTransitioning {
+public enum WInteractionControllerType {
+    case SwipeLeft, SwipeRight
+}
+
+public protocol WAnimatedTransitioning: UIViewControllerAnimatedTransitioning, UINavigationControllerDelegate {
     func animationSettings(_ settings: [String: Any]) -> Void
+}
+
+public protocol WInteractionController {
+    var interactionInProgress: Bool { get set }
+    func handleGesture(_ gestureRecognizer: UIGestureRecognizer) -> Void
+    func wireToViewController(viewController: UIViewController) -> Void
 }
 
 class TransitionController: NSObject {
     var presentingAnimator: WAnimatedTransitioning?
     var dismissingAnimator: WAnimatedTransitioning?
-    var dismissingInteractiveController: UIPercentDrivenInteractiveTransition?
+    var presentingInteractionController: WInteractionController?
+    var dismissingInteractiveController: WInteractionController?
     
     weak var designationViewController: UIViewController!
     
@@ -47,6 +58,15 @@ class TransitionController: NSObject {
             return controller
         }
     }
+    
+    func interactionController(type: WInteractionControllerType) -> WInteractionController {
+        switch type {
+        case .SwipeLeft:
+            return SwipeInteractionController()
+        case .SwipeRight:
+            return SwipeInteractionController()
+        }
+    }
 }
 
 extension TransitionController: UIViewControllerTransitioningDelegate {
@@ -58,7 +78,28 @@ extension TransitionController: UIViewControllerTransitioningDelegate {
         return dismissingAnimator
     }
     
-//    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-//                return dismissingInteractiveController?.interactionInProgress ? dismissingInteractiveController? : nil
-//            }
+    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        if dismissingInteractiveController?.interactionInProgress ?? false {
+            return dismissingInteractiveController as? UIViewControllerInteractiveTransitioning
+        } else {
+            return nil
+        }
+        //return (dismissingInteractiveController?.interactionInProgress)! ? dismissingInteractiveController as? UIViewControllerInteractiveTransitioning? : nil
+    }
+}
+
+extension TransitionController: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if operation == .push {
+            return presentingAnimator
+        } else {
+            return dismissingAnimator
+        }
+    }
+    
+//    func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+//        return dismissingInteractiveController as? UIViewControllerInteractiveTransitioning
+//    }
+
+    
 }

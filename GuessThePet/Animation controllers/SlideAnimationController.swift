@@ -44,11 +44,11 @@ class SlideAnimationController: NSObject, WAnimatedTransitioning {
             offScreenFinalPosition = CGAffineTransform(translationX: -container.frame.width, y: 0)
             offScreenStartPosition = CGAffineTransform(translationX: container.frame.width, y: 0)
         case .top:
-            offScreenFinalPosition = CGAffineTransform(translationX: container.frame.width, y: container.frame.height)
-            offScreenStartPosition = CGAffineTransform(translationX: container.frame.width, y: -container.frame.height)
+            offScreenFinalPosition = CGAffineTransform(translationX: 0, y: container.frame.height)
+            offScreenStartPosition = CGAffineTransform(translationX: 0, y: -container.frame.height)
         case .bottom:
-            offScreenFinalPosition = CGAffineTransform(translationX: container.frame.width, y: -container.frame.height)
-            offScreenStartPosition = CGAffineTransform(translationX: container.frame.width, y: container.frame.height)
+            offScreenFinalPosition = CGAffineTransform(translationX: 0, y: -container.frame.height)
+            offScreenStartPosition = CGAffineTransform(translationX: 0, y: container.frame.height)
         }
         
         

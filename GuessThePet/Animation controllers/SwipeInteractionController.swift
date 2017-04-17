@@ -8,19 +8,23 @@
 
 import UIKit
 
-class SwipeInteractionController: UIPercentDrivenInteractiveTransition {
+class SwipeInteractionController: UIPercentDrivenInteractiveTransition, WInteractionController {
+
     var interactionInProgress = false
     private var shouldCompleteTransition = false
     private weak var viewController: UIViewController!
     
-    func wireToViewController(viewController: UIViewController!) {
+    func wireToViewController(viewController: UIViewController) {
         self.viewController = viewController
         prepareGestureRecognizerInView(view: viewController.view)
     }
     
-    func handleGesture(_ gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
-        
+    func handleGesture(_ gestureRecognizer: UIGestureRecognizer) {
         // 1
+        guard let gestureRecognizer = gestureRecognizer as? UIScreenEdgePanGestureRecognizer else {
+            return
+        }
+        
         let translation = gestureRecognizer.translation(in: gestureRecognizer.view!.superview!)
         var progress = (translation.x / 200)
         progress = CGFloat(fminf(fmaxf(Float(progress), 0.0), 1.0))
