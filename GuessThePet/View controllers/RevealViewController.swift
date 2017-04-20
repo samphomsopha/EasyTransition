@@ -35,6 +35,9 @@ class RevealViewController: UIViewController {
     imageView.image = petCard?.image
   }
   
+    deinit {
+        print("DEINIT: REVEALVC")
+    }
   @IBAction fileprivate func dismissPressed(_ sender: UIButton) {
     dismiss(animated: true, completion: nil)
   }

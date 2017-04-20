@@ -76,7 +76,7 @@ class SlideAnimationController: NSObject, WAnimatedTransitioning {
         }, completion: { finished in
             
             // tell our transitionContext object that we've finished animating
-            transitionContext.completeTransition(true)
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
             
         })
         

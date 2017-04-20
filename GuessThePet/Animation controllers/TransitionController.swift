@@ -9,11 +9,15 @@
 import UIKit
 
 public enum WTransitionType {
-    case FlipPresent, FlipDismiss, SlideRight, SlideLeft, SlideTop, SlideBottom
+    case flipPresent, flipDismiss, slideRight, slideLeft, slideTop, slideBottom
 }
 
 public enum WInteractionControllerType {
-    case SwipeLeft, SwipeRight
+    case swipeLeft, swipeRight, swipeDown, swipeUp
+}
+
+public enum WInteractionControllerAction {
+    case present, dismiss
 }
 
 public protocol WAnimatedTransitioning: UIViewControllerAnimatedTransitioning, UINavigationControllerDelegate {
@@ -23,7 +27,8 @@ public protocol WAnimatedTransitioning: UIViewControllerAnimatedTransitioning, U
 public protocol WInteractionController {
     var interactionInProgress: Bool { get set }
     func handleGesture(_ gestureRecognizer: UIGestureRecognizer) -> Void
-    func wireToViewController(viewController: UIViewController) -> Void
+    func settings(_ settings: [String: Any])
+    func attachToViewController(viewController: UIViewController) -> Void
 }
 
 class TransitionController: NSObject {
@@ -36,41 +41,56 @@ class TransitionController: NSObject {
     
     func transitionAnimator(type: WTransitionType) -> WAnimatedTransitioning {
         switch type {
-        case .FlipDismiss:
+        case .flipDismiss:
             return FlipDismissAnimationController()
-        case .FlipPresent:
+        case .flipPresent:
             return FlipPresentAnimationController()
-        case .SlideRight:
+        case .slideRight:
             let controller = SlideAnimationController()
             controller.animationSettings(["direction": SlideAnimationDirection.right])
             return controller
-        case .SlideLeft:
+        case .slideLeft:
             let controller = SlideAnimationController()
             controller.animationSettings(["direction": SlideAnimationDirection.left])
             return controller
-        case .SlideTop:
+        case .slideTop:
             let controller = SlideAnimationController()
             controller.animationSettings(["direction": SlideAnimationDirection.top])
             return controller
-        case .SlideBottom:
+        case .slideBottom:
             let controller = SlideAnimationController()
             controller.animationSettings(["direction": SlideAnimationDirection.bottom])
             return controller
         }
     }
     
-    func interactionController(type: WInteractionControllerType) -> WInteractionController {
-        switch type {
-        case .SwipeLeft:
-            return SwipeInteractionController()
-        case .SwipeRight:
-            return SwipeInteractionController()
+    func interactionController(interactionType: WInteractionControllerType, action: WInteractionControllerAction? = .dismiss) -> WInteractionController {
+        var controller:WInteractionController?
+        if action == .present {
+            controller = SwipePresentInteractionController()
+        } else {
+            controller =  SwipeDismissInteractionController()
+        }
+        
+        switch interactionType {
+        case .swipeLeft:
+            controller?.settings(["direction": SwipeInteractionDirection.left])
+            return controller!
+        case .swipeRight:
+            controller?.settings(["direction": SwipeInteractionDirection.right])
+            return controller!
+        case .swipeUp:
+            controller?.settings(["direction": SwipeInteractionDirection.up])
+            return controller!
+        case .swipeDown:
+            controller?.settings(["direction": SwipeInteractionDirection.down])
+            return controller!
         }
     }
 }
 
 extension TransitionController: UIViewControllerTransitioningDelegate {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {        dismissingInteractiveController?.attachToViewController(viewController: presented)
         return presentingAnimator
     }
     
@@ -84,22 +104,34 @@ extension TransitionController: UIViewControllerTransitioningDelegate {
         } else {
             return nil
         }
-        //return (dismissingInteractiveController?.interactionInProgress)! ? dismissingInteractiveController as? UIViewControllerInteractiveTransitioning? : nil
+    }
+    
+    func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        if presentingInteractionController?.interactionInProgress ?? false {
+            return presentingInteractionController as? UIViewControllerInteractiveTransitioning
+        } else {
+            return nil
+        }
     }
 }
 
 extension TransitionController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        
         if operation == .push {
+            dismissingInteractiveController?.attachToViewController(viewController: toVC)
             return presentingAnimator
         } else {
+            presentingInteractionController?.attachToViewController(viewController: fromVC)
             return dismissingAnimator
         }
     }
-    
-//    func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-//        return dismissingInteractiveController as? UIViewControllerInteractiveTransitioning
-//    }
-
-    
+ 
+    func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        if dismissingInteractiveController?.interactionInProgress ?? false {
+            return dismissingInteractiveController as? UIViewControllerInteractiveTransitioning
+        } else {
+            return nil
+        }
+    }
 }

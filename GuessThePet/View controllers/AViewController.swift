@@ -15,16 +15,26 @@ class AViewController: UIViewController {
     var dismissTransition: WAnimatedTransitioning!
     let petCards = PetCardStore.defaultPets()
     var swipeInteractionController: WInteractionController!
+    var swipeLeftInteractionController: WInteractionController!
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "HELLO WORLD"
         // Do any additional setup after loading the view.
-        presentTransition = transitionController.transitionAnimator(type: .SlideTop)
-        dismissTransition = transitionController.transitionAnimator(type: .SlideBottom)
-        swipeInteractionController = transitionController.interactionController(type: .SwipeRight)
+        presentTransition = transitionController.transitionAnimator(type: .slideLeft)
+        dismissTransition = transitionController.transitionAnimator(type: .slideRight)
+        swipeInteractionController = transitionController.interactionController(interactionType: .swipeRight)
+        swipeLeftInteractionController = transitionController.interactionController(interactionType: .swipeLeft)
         transitionController.presentingAnimator = presentTransition
         transitionController.dismissingAnimator = dismissTransition
         transitionController.dismissingInteractiveController = swipeInteractionController
+        
+        transitionController.presentingInteractionController = swipeLeftInteractionController
+        
+        navigationController?.delegate = transitionController
+        //transitioningDelegate = transitionController
+        
+        swipeLeftInteractionController.attachToViewController(viewController: self)
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -32,16 +42,10 @@ class AViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
-    
     @IBAction func nextButtonAction(_ sender: UIButton) {
         if let destinationViewController = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RevealViewController") as? RevealViewController {
             destinationViewController.petCard = petCards[0]
-            navigationController?.delegate = transitionController
-            //destinationViewController.transitioningDelegate = transitionController
-            //swipeInteractionController.wireToViewController(viewController: destinationViewController)
-            //present(destinationViewController, animated: true, completion: nil)
-            swipeInteractionController.wireToViewController(viewController: destinationViewController)
+            destinationViewController.transitioningDelegate = transitionController
             navigationController?.pushViewController(destinationViewController, animated: true)
             print("present")
         }
