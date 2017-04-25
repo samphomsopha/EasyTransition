@@ -16,6 +16,7 @@ class SwipeDismissInteractionController: UIPercentDrivenInteractiveTransition, W
     
     var swipeDirection: SwipeInteractionDirection = .right
     var interactionInProgress = false
+    var presentationStyle: SwipePresentInteractionPresentationStyle = .present
     
     private var isPushed: Bool {
         return (viewController.presentingViewController == nil && viewController?.navigationController != nil)
@@ -30,7 +31,7 @@ class SwipeDismissInteractionController: UIPercentDrivenInteractiveTransition, W
         }
     }
     
-    func attachToViewController(viewController: UIViewController) {
+    func attachToViewController(viewController: UIViewController, toVC: UIViewController?) {
         self.viewController = viewController
         prepareGestureRecognizerInView(view: viewController.view)
     }

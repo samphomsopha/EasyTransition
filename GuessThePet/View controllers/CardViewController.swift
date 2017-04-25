@@ -27,8 +27,7 @@ private let transitioncontroller = TransitionController()
 private let flipPresentAnimationController = transitioncontroller.transitionAnimator(type: .slideLeft)
 private let flipDismissAnimationController = transitioncontroller.transitionAnimator(type: .slideRight)
 private let swipeInteractionController = transitioncontroller.interactionController(interactionType: .swipeRight)
-
-private let swipePresentIC = transitioncontroller.interactionController(interactionType: .swipeUp)
+private let swipePresentIC = transitioncontroller.interactionController(interactionType: .swipeLeft, action: WInteractionControllerAction.present)
 
 class CardViewController: UIViewController {
     
@@ -37,6 +36,7 @@ class CardViewController: UIViewController {
     
     var pageIndex: Int?
     var petCard: PetCard?
+    var toVC: UIViewController?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,15 +51,23 @@ class CardViewController: UIViewController {
         transitioncontroller.dismissingAnimator = flipDismissAnimationController
         transitioncontroller.dismissingInteractiveController = swipeInteractionController
         transitioncontroller.presentingInteractionController = swipePresentIC
-        swipePresentIC.attachToViewController(viewController: self)
+        if let dcVC = getDesignationVC() {
+            toVC = dcVC
+            swipePresentIC.attachToViewController(viewController: self, toVC: dcVC)
+        }
         transitioningDelegate = transitioncontroller
     }
     
     func handleTap() {
+        present(getDesignationVC()!, animated: true, completion: nil)
+    }
+    
+    func getDesignationVC() -> UIViewController? {
         if let destinationViewController = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RevealViewController") as? RevealViewController {
             destinationViewController.petCard = petCard
             destinationViewController.transitioningDelegate = transitioncontroller
-            present(destinationViewController, animated: true, completion: nil)
+            return destinationViewController
         }
+        return nil
     }
 }

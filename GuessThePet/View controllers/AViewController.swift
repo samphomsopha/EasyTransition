@@ -16,6 +16,7 @@ class AViewController: UIViewController {
     let petCards = PetCardStore.defaultPets()
     var swipeInteractionController: WInteractionController!
     var swipeLeftInteractionController: WInteractionController!
+    var destinationViewController: UIViewController?
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "HELLO WORLD"
@@ -23,7 +24,7 @@ class AViewController: UIViewController {
         presentTransition = transitionController.transitionAnimator(type: .slideLeft)
         dismissTransition = transitionController.transitionAnimator(type: .slideRight)
         swipeInteractionController = transitionController.interactionController(interactionType: .swipeRight)
-        swipeLeftInteractionController = transitionController.interactionController(interactionType: .swipeLeft)
+        swipeLeftInteractionController = transitionController.interactionController(interactionType: .swipeLeft, action: WInteractionControllerAction.push)
         transitionController.presentingAnimator = presentTransition
         transitionController.dismissingAnimator = dismissTransition
         transitionController.dismissingInteractiveController = swipeInteractionController
@@ -31,24 +32,28 @@ class AViewController: UIViewController {
         transitionController.presentingInteractionController = swipeLeftInteractionController
         
         navigationController?.delegate = transitionController
-        //transitioningDelegate = transitionController
         
-        swipeLeftInteractionController.attachToViewController(viewController: self)
-        
+        if let destinationViewController = getDesignationVC() {
+            self.destinationViewController = destinationViewController
+            swipeLeftInteractionController.attachToViewController(viewController: self, toVC: self.destinationViewController)
+        }
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
     @IBAction func nextButtonAction(_ sender: UIButton) {
+        navigationController?.pushViewController(getDesignationVC()!, animated: true)
+    }
+    
+    func getDesignationVC() -> UIViewController? {
         if let destinationViewController = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RevealViewController") as? RevealViewController {
             destinationViewController.petCard = petCards[0]
-            destinationViewController.transitioningDelegate = transitionController
-            navigationController?.pushViewController(destinationViewController, animated: true)
-            print("present")
+            return destinationViewController
         }
+        return nil
     }
 
 }

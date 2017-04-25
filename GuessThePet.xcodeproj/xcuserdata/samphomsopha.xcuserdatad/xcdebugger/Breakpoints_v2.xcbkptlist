@@ -121,13 +121,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "GuessThePet/View controllers/AViewController.swift"
-            timestampString = "514168562.05482"
+            filePath = "GuessThePet/Animation controllers/SwipeInteractionController.swift"
+            timestampString = "514169462.567939"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "20"
-            endingLineNumber = "20"
-            landmarkName = "viewDidLoad()"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
+            landmarkName = "handleGesture(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -137,12 +137,12 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "GuessThePet/Animation controllers/SwipeInteractionController.swift"
-            timestampString = "514169462.567939"
+            filePath = "GuessThePet/Animation controllers/SwipePresentInteractionController.swift"
+            timestampString = "514784009.442991"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "80"
-            endingLineNumber = "80"
+            startingLineNumber = "84"
+            endingLineNumber = "84"
             landmarkName = "handleGesture(_:)"
             landmarkType = "7">
          </BreakpointContent>
