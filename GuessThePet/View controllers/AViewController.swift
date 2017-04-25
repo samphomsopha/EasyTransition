@@ -8,34 +8,54 @@
 
 import UIKit
 
-class AViewController: UIViewController {
+protocol SlideAnimationTransition:class {
+    var transitionController: TransitionController! { get set }
+    var presentTransition: WAnimatedTransitioning? { get set }
+    var dismissTransition: WAnimatedTransitioning? { get set }
+    var dismissInteractionController: WInteractionController? { get set }
+    var presentInteractionController: WInteractionController? { get set }
+    func initializeTransitionController() -> Void
+}
 
-    let transitionController = TransitionController()
-    var presentTransition: WAnimatedTransitioning!
-    var dismissTransition: WAnimatedTransitioning!
+protocol SlideNavigationAnimationTransition: SlideAnimationTransition {
+    
+}
+
+extension SlideNavigationAnimationTransition where Self:UIViewController {
+    func initializeTransitionController() {
+        transitionController = TransitionController()
+        presentTransition = transitionController.transitionAnimator(type: .slideLeft)
+        dismissTransition = transitionController.transitionAnimator(type: .slideRight)
+        presentInteractionController = transitionController.interactionController(interactionType: .swipeLeft, action: .push)
+        dismissInteractionController = transitionController.interactionController(interactionType: .swipeRight)
+        transitionController.presentingAnimator = presentTransition
+        transitionController.dismissingAnimator = dismissTransition
+        transitionController.presentingInteractiveController = presentInteractionController
+        transitionController.dismissingInteractiveController = dismissInteractionController
+        navigationController?.delegate = transitionController
+    }
+}
+
+class AViewController: UIViewController, SlideNavigationAnimationTransition {
+
+    var transitionController: TransitionController!
+    var presentTransition: WAnimatedTransitioning?
+    var dismissTransition: WAnimatedTransitioning?
+    var dismissInteractionController: WInteractionController?
+    var presentInteractionController: WInteractionController?
+    
     let petCards = PetCardStore.defaultPets()
-    var swipeInteractionController: WInteractionController!
-    var swipeLeftInteractionController: WInteractionController!
     var destinationViewController: UIViewController?
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        initializeTransitionController()
         title = "HELLO WORLD"
         // Do any additional setup after loading the view.
-        presentTransition = transitionController.transitionAnimator(type: .slideLeft)
-        dismissTransition = transitionController.transitionAnimator(type: .slideRight)
-        swipeInteractionController = transitionController.interactionController(interactionType: .swipeRight)
-        swipeLeftInteractionController = transitionController.interactionController(interactionType: .swipeLeft, action: WInteractionControllerAction.push)
-        transitionController.presentingAnimator = presentTransition
-        transitionController.dismissingAnimator = dismissTransition
-        transitionController.dismissingInteractiveController = swipeInteractionController
-        
-        transitionController.presentingInteractionController = swipeLeftInteractionController
-        
-        navigationController?.delegate = transitionController
         
         if let destinationViewController = getDesignationVC() {
             self.destinationViewController = destinationViewController
-            swipeLeftInteractionController.attachToViewController(viewController: self, toVC: self.destinationViewController)
+            presentInteractionController?.attachToViewController(viewController: self, toVC: self.destinationViewController)
         }
     }
     

@@ -35,7 +35,7 @@ public protocol WInteractionController:class {
 class TransitionController: NSObject {
     var presentingAnimator: WAnimatedTransitioning?
     var dismissingAnimator: WAnimatedTransitioning?
-    var presentingInteractionController: WInteractionController?
+    var presentingInteractiveController: WInteractionController?
     var dismissingInteractiveController: WInteractionController?
     
     weak var designationViewController: UIViewController!
@@ -115,8 +115,8 @@ extension TransitionController: UIViewControllerTransitioningDelegate {
     }
     
     func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        if presentingInteractionController?.interactionInProgress ?? false {
-            return presentingInteractionController as? UIViewControllerInteractiveTransitioning
+        if presentingInteractiveController?.interactionInProgress ?? false {
+            return presentingInteractiveController as? UIViewControllerInteractiveTransitioning
         } else {
             return nil
         }
@@ -138,8 +138,8 @@ extension TransitionController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         if dismissingInteractiveController?.interactionInProgress ?? false {
             return dismissingInteractiveController as? UIViewControllerInteractiveTransitioning
-        } else if presentingInteractionController?.interactionInProgress ?? false {
-            return presentingInteractionController as? UIViewControllerInteractiveTransitioning
+        } else if presentingInteractiveController?.interactionInProgress ?? false {
+            return presentingInteractiveController as? UIViewControllerInteractiveTransitioning
         } else {
             return nil
         }

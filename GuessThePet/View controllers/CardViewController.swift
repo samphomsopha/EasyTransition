@@ -50,7 +50,7 @@ class CardViewController: UIViewController {
         transitioncontroller.presentingAnimator = flipPresentAnimationController
         transitioncontroller.dismissingAnimator = flipDismissAnimationController
         transitioncontroller.dismissingInteractiveController = swipeInteractionController
-        transitioncontroller.presentingInteractionController = swipePresentIC
+        transitioncontroller.presentingInteractiveController = swipePresentIC
         if let dcVC = getDesignationVC() {
             toVC = dcVC
             swipePresentIC.attachToViewController(viewController: self, toVC: dcVC)
